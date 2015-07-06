@@ -18,7 +18,6 @@ if (!datasource) {
 
 datasource.createModel('Migration', {
     "name": {
-        "id": true,
         "type": "String",
         "required": true,
         "length": 100,
