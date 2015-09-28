@@ -1,5 +1,5 @@
 {
-  "name": "loopback-db-migrate",
+  "name": "@mediasuite/loopback-db-migrate",
   "version": "0.0.2",
   "author": {
     "name": "Scott Lively"
