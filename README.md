@@ -13,7 +13,8 @@ Down migrations are run in reverse run order.
 
 Options:
   --datasource specify database name (optional, default: db)
-  --since specify date to run migrations from (options, default: run all migrations)
+  --since specify date to run migrations from (optional, default: run all migrations)
+  --count specify number of migrations to run from current state (optional, default: run all migrations)
 ```
 
 <h2>Using the CLI directly</h2>
@@ -25,6 +26,11 @@ Run all new migrations that have not previously been run, using datasources.json
 Run all new migrations since 01012014 that have not previously been run, using datasources.json and datasources.qa.json and database 'my_db_name':
 ```javascript
 NODE_ENV=qa ./node_modules/loopback-db-migrate/loopback-db-migrate.js up --datasource my_db_name --since 01012014
+```
+
+Rollback the previous migration that was run, using datasources.json and datasources.qa.json and database 'my_db_name':
+```javascript
+NODE_ENV=qa ./node_modules/loopback-db-migrate/loopback-db-migrate.js down --datasource my_db_name --count 1
 ```
 
 <h2>Using the CLI with npm by updating your package.json</h2>
