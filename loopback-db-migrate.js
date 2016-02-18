@@ -7,6 +7,8 @@ var fs = require('fs'),
     dbName = (dbNameFlag > -1) ? process.argv[dbNameFlag + 1] : 'db',
     dateSinceFlag = process.argv.indexOf('--since'),
     dateSinceFilter = (dateSinceFlag > -1) ? process.argv[dateSinceFlag + 1] : '',
+    countFlag = process.argv.indexOf('--count'),
+    countFilter = (countFlag > -1) ? process.argv[countFlag + 1] : '',
     migrationsFolder = process.cwd() + '/server/migrations/',
     dbMigrationsFolder = migrationsFolder+dbName,
     datasource = require(process.cwd() + '/server/server.js').dataSources[dbName];
@@ -50,11 +52,16 @@ function mapScriptObjName(scriptObj){
 
 function findScriptsToRun(upOrDown, cb) {
     var filters = {
-        where: {
-            name: { gte: dateSinceFilter+'' || '' }
-        },
         order: (upOrDown === 'up' ) ? 'name ASC' : 'name DESC'
     };
+    if (dateSinceFilter) {
+        filters.where = {
+            name: { gte: dateSinceFilter+'' || '' }
+        }
+    }
+    if (countFilter && upOrDown === 'down') {
+        filters.limit = countFilter
+    }
 
     // get all local scripts and filter for only .js files
     var localScriptNames = fs.readdirSync(dbMigrationsFolder).filter(function(fileName) {
@@ -81,9 +88,13 @@ function findScriptsToRun(upOrDown, cb) {
                 var runScriptsNames = scriptsRun.map(mapScriptObjName);
 
                 // return scripts that exist on disk but not in the db
-                cb(localScriptNames.filter(function (scriptName) {
+                var scriptNamesToRun = localScriptNames.filter(function (scriptName) {
                     return runScriptsNames.indexOf(scriptName) < 0;
-                }));
+                })
+                if (countFilter) {
+                    scriptNamesToRun = scriptNamesToRun.slice(0, countFilter)
+                }
+                cb(scriptNamesToRun);
             } else {
                 // return all db script names
                 cb(scriptsRun.map(mapScriptObjName));
